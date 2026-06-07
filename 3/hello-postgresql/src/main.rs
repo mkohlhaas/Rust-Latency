@@ -17,7 +17,7 @@ async fn main() -> anyhow::Result<()> {
     let pool = create_pool()?;
     let app = move || {
         App::new()
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(pool.clone())) // why clone? `pool` is moved!
             .service(
                 web::resource("/hello")
                     .route(web::get().to(say_hello)),
@@ -46,7 +46,7 @@ async fn say_hello(
         .get()
         .await
         .map_err(ErrorInternalServerError)?;
-    let result = conn
+    let result: tokio_postgres::Row = conn
         .query_one("SELECT 'hello world'", &[])
         .await
         .map_err(ErrorInternalServerError)?;
