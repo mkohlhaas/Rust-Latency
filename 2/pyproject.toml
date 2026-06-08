@@ -1,0 +1,12 @@
+[project]
+name = "2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "hdrhistogram>=0.10.3",
+    "matplotlib>=3.10.9",
+    "ping3>=5.1.5",
+    "statsmodels>=0.14.6",
+]
