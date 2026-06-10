@@ -7,13 +7,15 @@
 use std::collections::HashMap;
 use std::sync::Mutex;
 
+type Data = Mutex<HashMap<String, String>>;
+
 /// A thread-safe key-value store with interior mutability.
 ///
 /// This store allows multiple threads to safely read and write key-value pairs
 /// without requiring external synchronization. All operations are atomic and
 /// the store handles locking internally.
 pub struct KVStore {
-  data: Mutex<HashMap<String, String>>,
+  data: Data,
 }
 
 impl KVStore {
@@ -59,7 +61,7 @@ impl KVStore {
   ///
   /// # Returns
   /// Vector of (key, value) tuples representing all stored data
-  pub fn keys(&self) -> Vec<(String, String)> {
+  pub fn kv_pairs(&self) -> Vec<(String, String)> {
     self
       .data
       .lock()

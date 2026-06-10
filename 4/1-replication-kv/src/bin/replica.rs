@@ -45,9 +45,9 @@
 
 use replication_kv::protocol::Message;
 use replication_kv::store::KVStore;
-use rustyline::error::ReadlineError;
 use rustyline::DefaultEditor;
-use std::io::{prelude::*, BufRead, BufReader};
+use rustyline::error::ReadlineError;
+use std::io::{BufRead, BufReader, prelude::*};
 use std::net::{TcpListener, TcpStream};
 use std::sync::Arc;
 use std::thread;
@@ -98,6 +98,7 @@ fn main() {
           }
           ["EXIT"] => {
             println!("Goodbye!");
+            // NOTE: Replica should deregister with/disconnect from primary!
             break;
           }
           _ => {
@@ -183,7 +184,8 @@ fn handle_connection(mut stream: TcpStream, storage: Arc<KVStore>) {
 fn join_primary(host_port: &str, storage: &Arc<KVStore>, join_message: &Message) {
   match TcpStream::connect(host_port) {
     Ok(mut stream) => {
-      if stream.write_all(join_message.format().as_bytes()).is_err() {
+      if stream.write_all(join_message.fmt_msg().as_bytes()).is_err() {
+        // NOTE: no error message, resend attempt, ... ?
         return;
       }
       let mut reader = BufReader::new(stream);

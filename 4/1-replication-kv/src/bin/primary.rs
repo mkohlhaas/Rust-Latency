@@ -45,8 +45,8 @@
 use replication_kv::protocol::Message;
 use replication_kv::store::KVStore;
 use replication_kv::topology::ReplicaSet;
-use rustyline::error::ReadlineError;
 use rustyline::DefaultEditor;
+use rustyline::error::ReadlineError;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use std::sync::Arc;
@@ -170,7 +170,7 @@ fn handle_connection(mut stream: TcpStream, storage: Arc<KVStore>, replicas: Arc
             send_snapshot(&mut stream, &storage);
           }
           _ => {
-            // Ignore other messages
+            // ignore other messages
           }
         }
       }
@@ -190,9 +190,9 @@ fn handle_connection(mut stream: TcpStream, storage: Arc<KVStore>, replicas: Arc
 /// * `stream` - TCP stream to the replica
 /// * `storage` - Key-value store containing current state
 fn send_snapshot(stream: &mut TcpStream, storage: &Arc<KVStore>) {
-  let entries = storage.keys();
+  let entries = storage.kv_pairs();
   let snapshot = Message::Snapshot { entries };
-  let _ = stream.write_all(snapshot.format().as_bytes());
+  let _ = stream.write_all(snapshot.fmt_msg().as_bytes());
 }
 
 /// Broadcast a message to all registered replicas.
@@ -206,7 +206,8 @@ fn send_snapshot(stream: &mut TcpStream, storage: &Arc<KVStore>) {
 fn broadcast(replicas: &Arc<ReplicaSet>, message: &Message) {
   for replica_addr in replicas.iter() {
     if let Ok(mut stream) = TcpStream::connect(&replica_addr) {
-      let _ = stream.write_all(message.format().as_bytes());
+      // skips not available replicas
+      let _ = stream.write_all(message.fmt_msg().as_bytes());
     }
   }
 }

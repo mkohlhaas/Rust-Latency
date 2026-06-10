@@ -10,11 +10,12 @@
 //!
 //! ### Protocol Messages
 //!
-//! | Message | Direction | Format | Purpose |
-//! |---------|-----------|--------|---------|
-//! | `JOIN` | Replica → Primary | `JOIN <replica_addr>\n` | Register replica with primary |
-//! | `PUT` | Primary → Replica | `PUT <key> <value>\n` | Replicate key-value update |
-//! | `SNAPSHOT_END` | Primary → Replica | `SNAPSHOT_END\n` | Mark end of initial state transfer |
+//! | Message        | Direction         | Format                  | Purpose |
+//! |----------------|-------------------|-------------------------|------------------------------------|
+//! | `JOIN`         | Replica → Primary | `JOIN <replica_addr>\n` | Register replica with primary
+//! | `PUT`          | Primary → Replica | `PUT <key> <value>\n`   | Replicate key-value update
+//! | `SNAPSHOT_END` | Primary → Replica | `SNAPSHOT_END\n`        | Mark end of initial state transfer |
+//! |----------------|-------------------|-------------------------|------------------------------------|
 //!
 //! ## Protocol Flow
 //!
@@ -96,20 +97,26 @@ impl Message {
   /// # Returns
   /// * `Some(Message)` if the input is a valid protocol message
   /// * `None` if the input cannot be parsed
-  pub fn parse(input: &str) -> Option<Message> {
-    let input = input.trim();
+  pub fn parse(msg: &str) -> Option<Message> {
+    let input = msg.trim();
+
     if input == "SNAPSHOT_END" {
       return Some(Message::SnapshotEnd);
     }
+
     let parts: Vec<&str> = input.split_whitespace().collect();
+
+    use Message::*;
     match parts.as_slice() {
-      ["PUT", key, value] => Some(Message::Put {
+      ["PUT", key, value] => Some(Put {
         key: key.to_string(),
         value: value.to_string(),
       }),
-      ["JOIN", replica_addr] => Some(Message::Join {
+
+      ["JOIN", replica_addr] => Some(Join {
         replica_addr: replica_addr.to_string(),
       }),
+
       _ => None,
     }
   }
@@ -121,7 +128,7 @@ impl Message {
   ///
   /// # Returns
   /// String representation of the message with newline termination
-  pub fn format(&self) -> String {
+  pub fn fmt_msg(&self) -> String {
     match self {
       Message::Put { key, value } => format!("PUT {} {}\n", key, value),
       Message::Join { replica_addr } => format!("JOIN {}\n", replica_addr),
@@ -133,7 +140,7 @@ impl Message {
         ret.push_str("SNAPSHOT_END\n");
         ret
       }
-      Message::SnapshotEnd => "SNAPSHOT_END\n".to_string(),
+      Message::SnapshotEnd => "SNAPSHOT_END\n".to_string(), // will never be reached
     }
   }
 }

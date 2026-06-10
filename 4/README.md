@@ -1,0 +1,1 @@
+- Worker example is obsolete!
