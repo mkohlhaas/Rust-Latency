@@ -26,7 +26,7 @@ pub fn fib_iterative(n: u64) -> u64 {
   for _ in 0..n {
     let prev = current;
     current = next;
-    next = prev + next;
+    next += prev;
   }
   current
 }
@@ -48,6 +48,10 @@ mod tests {
     assert_eq!(fib_recursive(8), 21);
     assert_eq!(fib_recursive(9), 34);
     assert_eq!(fib_recursive(10), 55);
+    assert_eq!(fib_recursive(30), 832040);
+
+    // takes too long
+    // assert_eq!(fib_recursive(50), 12586269025);
   }
 
   #[test]
@@ -63,6 +67,8 @@ mod tests {
     assert_eq!(fib_memoization(8), 21);
     assert_eq!(fib_memoization(9), 34);
     assert_eq!(fib_memoization(10), 55);
+    assert_eq!(fib_memoization(30), 832040);
+    assert_eq!(fib_memoization(50), 12586269025);
   }
 
   #[test]
@@ -78,5 +84,7 @@ mod tests {
     assert_eq!(fib_iterative(8), 21);
     assert_eq!(fib_iterative(9), 34);
     assert_eq!(fib_iterative(10), 55);
+    assert_eq!(fib_iterative(30), 832040);
+    assert_eq!(fib_iterative(50), 12586269025);
   }
 }
