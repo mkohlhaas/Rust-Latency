@@ -1,4 +1,4 @@
-/// A bounded queue.
+/// a bounded queue
 pub struct Queue<T: Default + Copy, const N: usize> {
   data: [T; N],
   front: usize,
@@ -32,6 +32,12 @@ impl<T: Default + Copy, const N: usize> Queue<T, N> {
   }
 }
 
+impl<T: Default + Copy, const N: usize> Default for Queue<T, N> {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -44,7 +50,7 @@ mod tests {
     assert_eq!(queue.push(2), Ok(()));
     assert_eq!(queue.push(3), Ok(()));
     assert_eq!(queue.push(4), Ok(()));
-    assert_eq!(queue.push(5), Err(5));
+    assert_eq!(queue.push(5), Err(5)); // queue is full
     assert_eq!(queue.pop(), Some(1));
     assert_eq!(queue.pop(), Some(2));
     assert_eq!(queue.pop(), Some(3));

@@ -1,0 +1,16 @@
+[package]
+name = "spsc-queue"
+version = "0.0.0"
+edition = "2024"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = [
+  "html_reports",
+  "async",
+  "async_futures",
+] }
+pprof = { version = "0.15.0", features = ["criterion", "flamegraph"] }
+
+[[bench]]
+name = "benchmark"
+harness = false

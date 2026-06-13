@@ -50,53 +50,59 @@ fn stop_threads(threads: Vec<JoinHandle<()>>, stop_signal: Arc<AtomicBool>) {
 
 fn bench(c: &mut Criterion) {
   let mut group = c.benchmark_group("locking-bench");
-  group.bench_function("Mutex::lock()+unlock() (1 thread)", |b| {
+
+  group.bench_function("Mutex::lock()+unlock() (1 thread)", |bencher| {
     let counter = Mutex::new(0);
-    b.iter(|| {
+    bencher.iter(|| {
       let mut counter = counter.lock().unwrap();
       *counter += 1;
     });
   });
-  group.bench_function("Mutex::lock()+unlock() (10 threads)", |b| {
+
+  group.bench_function("Mutex::lock()+unlock() (10 threads)", |bencher| {
     let counter = Arc::new(Mutex::new(0));
     let stop_signal = Arc::new(AtomicBool::new(false));
     let threads = spawn_mutex_threads(counter.clone(), stop_signal.clone(), 9);
-    b.iter(|| {
+    bencher.iter(|| {
       let mut counter = counter.lock().unwrap();
       *counter += 1;
     });
     stop_threads(threads, stop_signal);
   });
-  group.bench_function("Mutex::lock()+unlock() (100 threads)", |b| {
+
+  group.bench_function("Mutex::lock()+unlock() (100 threads)", |bencher| {
     let counter = Arc::new(Mutex::new(0));
     let stop_signal = Arc::new(AtomicBool::new(false));
     let threads = spawn_mutex_threads(counter.clone(), stop_signal.clone(), 99);
-    b.iter(|| {
+    bencher.iter(|| {
       let mut counter = counter.lock().unwrap();
       *counter += 1;
     });
     stop_threads(threads, stop_signal);
   });
-  group.bench_function("RwLock::lock()+unlock() (1 thread)", |b| {
+
+  group.bench_function("RwLock::lock()+unlock() (1 thread)", |bencher| {
     let counter = RwLock::new(0);
-    b.iter(|| {
+    bencher.iter(|| {
       let _unused = counter.read().unwrap();
     });
   });
-  group.bench_function("RwLock::lock()+unlock() (10 threads)", |b| {
+
+  group.bench_function("RwLock::lock()+unlock() (10 threads)", |bencher| {
     let counter = Arc::new(RwLock::new(0));
     let stop_signal = Arc::new(AtomicBool::new(false));
     let threads = spawn_rwlock_threads(counter.clone(), stop_signal.clone(), 9);
-    b.iter(|| {
+    bencher.iter(|| {
       let _unused = counter.read().unwrap();
     });
     stop_threads(threads, stop_signal);
   });
-  group.bench_function("RwLock::lock()+unlock() (100 threads)", |b| {
+
+  group.bench_function("RwLock::lock()+unlock() (100 threads)", |bencher| {
     let counter = Arc::new(RwLock::new(0));
     let stop_signal = Arc::new(AtomicBool::new(false));
     let threads = spawn_rwlock_threads(counter.clone(), stop_signal.clone(), 99);
-    b.iter(|| {
+    bencher.iter(|| {
       let _unused = counter.read().unwrap();
     });
     stop_threads(threads, stop_signal);

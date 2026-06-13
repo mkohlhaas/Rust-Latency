@@ -3,9 +3,9 @@ use std::thread;
 
 fn main() {
   let counter = Mutex::new(0);
-  thread::scope(|s| {
+  thread::scope(|scope| {
     for _ in 0..100 {
-      s.spawn(|| {
+      scope.spawn(|| {
         let mut counter = counter.lock().unwrap();
         *counter += 1;
       });
